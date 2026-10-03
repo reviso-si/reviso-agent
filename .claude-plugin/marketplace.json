@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "reviso-agent",
+  "description": "Reviso for agents — publish a Markdown or HTML draft so a human team can review it, then read their feedback back and publish a revision.",
+  "owner": {
+    "name": "Reviso",
+    "url": "https://github.com/reviso-si"
+  },
+  "plugins": [
+    {
+      "name": "reviso",
+      "description": "Publish drafts to Reviso for human review, read reviewer comments back, and publish revisions against the version you actually read. Never overwrites a concurrent human edit.",
+      "category": "content",
+      "tags": ["reviso", "review", "collaboration", "documents", "mcp"],
+      "source": {
+        "source": "github",
+        "repo": "reviso-si/reviso-agent",
+        "ref": "main"
+      }
+    }
+  ]
+}
