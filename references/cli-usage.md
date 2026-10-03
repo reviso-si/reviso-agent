@@ -2,7 +2,14 @@
 
 Use this file only when the user asked for the command line, or when their
 environment has no MCP support. Check that `reviso` exists before running
-anything. If it does not, ask before installing.
+anything. If it does not, ask before installing:
+
+```bash
+pip install reviso-cli
+```
+
+It installs the `reviso` command and has no runtime dependencies. Do not install
+it without the user's agreement.
 
 ## One rule that overrides convenience
 
