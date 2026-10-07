@@ -29,6 +29,8 @@ Check in this order. Do not skip to the end.
 **1. Reviso MCP tools are present in this session.** If you can see tools named
 `reviso_document_create`, `reviso_document_retrieve`, `reviso_document_apply_patch`,
 or similar, use them. Read [references/mcp-tools.md](references/mcp-tools.md).
+A connection may expose only a smaller catalog, so check which tools you actually
+have before promising a step rather than assuming the full set.
 
 **2. No MCP tools.** Tell the user Reviso is not connected yet and point them at
 [references/mcp-setup.md](references/mcp-setup.md). Then **stop and wait**. Do not

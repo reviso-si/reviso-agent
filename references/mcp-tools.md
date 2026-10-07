@@ -7,6 +7,39 @@ publish a revision based on the version you actually read.
 Tool results can carry `isError: true` on a result that otherwise looks fine.
 Always check that field. A JSON-RPC `result` wrapper is not proof of success.
 
+## Not every connection exposes every tool
+
+A connection can be restricted to a smaller catalog. The core catalog is these
+fifteen tools, and anything described below that is not in this list may simply
+be absent:
+
+```
+reviso_document_create          reviso_document_update
+reviso_document_retrieve        reviso_document_read_structure
+reviso_document_apply_patch     reviso_list_documents
+reviso_list_workspaces          reviso_search_documents
+reviso_comment_create           reviso_comment_reply
+reviso_share_create             reviso_connection_self
+reviso_document_list_failed_intents
+reviso_document_failed_intent
+reviso_document_resolve_failed_intent
+```
+
+Work out which catalog you have before you promise a step. If a tool this file
+names is missing, use the substitute, and say so rather than retrying it:
+
+| Missing tool | Use instead |
+| --- | --- |
+| `reviso_document_status` | `reviso_document_retrieve` with `include: ["comments", "versions"]` |
+| `reviso_event_wait` | Ask the human to tell you when they are done, then re-retrieve |
+| `reviso_version_diff` | Retrieve both versions and compare, or ask what changed |
+| `reviso_document_rollback` | Not available; ask the human to roll back in the browser |
+| `reviso_list_invites`, `reviso_document_rename`, `reviso_document_restore` | Ask the human to do it in the browser |
+
+The whole review loop -- create, retrieve, read structure, apply patch, and
+recover a rejected write -- is available in the core catalog. Only the
+convenience reads are not.
+
 ## Turn 1: publish a draft
 
 ```
@@ -77,7 +110,7 @@ This path is block-aware: a stale base still merges when concurrent edits touche
 
 ```
 reviso_document_status                    # read the current head first
-  document_id  "doc_..."
+  document_id  "doc_..."                  # (core catalog: retrieve instead)
 
 reviso_document_update
   document_id      "doc_..."
@@ -99,7 +132,19 @@ Recover it rather than starting over:
    see what was rejected and what it collided with.
 2. Re-read: `reviso_document_read_structure`.
 3. Re-apply your change against the fresh base.
-4. `reviso_document_resolve_failed_intent` to close the handle.
+4. `reviso_document_resolve_failed_intent` to close the handle. It needs a
+   `resolution`, and the value you choose is a statement about what happened:
+
+   | `resolution` | Use it when |
+   | --- | --- |
+   | `resolved` | You re-applied the edit and it landed against the fresh base. |
+   | `discarded` | You are accepting the live head and dropping your edit on purpose. |
+   | `comment` | You cannot recover. This surfaces your blocked edit to the human as a review comment. |
+
+   **Do not reach for `discarded` just to clear the handle.** A blocked edit that
+   you could not apply must not disappear silently -- use `comment` so the human
+   sees what you tried to change and can decide. Losing someone's edit quietly is
+   the exact failure this whole loop exists to prevent.
 
 Never retry by dropping the base version or by re-sending the same patch
 unchanged. If you did not expect the human's edit, tell the user what changed
