@@ -49,9 +49,21 @@ reviso_document_create
   description    "Initial draft"            (required)
   source_format  "markdown" | "html"        (default markdown)
   workspace_id   optional
+  source_kind         optional
+  source_session_id   optional
 ```
 
 `description` is required even on create; say what this version is.
+
+**Provenance (`source_kind` / `source_session_id`).** When the draft is produced
+inside a host session that has its own identity — a DeepSeek Harness session
+(`source_kind: "dsh"`, `source_session_id: <the harness session id>`), a CI run,
+or another agent runtime — pass both fields so the document is bound to that
+session. Source-scoped surfaces (for example the DSH plugin's per-session
+Reviso tab, which reads `GET /api/documents?session_key=dsh:<sessionId>`) list
+exactly these documents; a draft published without them shows up only in the
+owner's full dashboard. Use the real session id you are running in, never a
+guessed one.
 
 The result carries the document link. Give the human the plain document URL, not
 a share link, unless they asked for a share link. Keep the `document_id` for later

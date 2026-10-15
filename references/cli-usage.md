@@ -52,6 +52,14 @@ reviso publish draft.md \
 
 Format is inferred from the file extension; `--format html` overrides it.
 
+**Provenance flags.** When the draft is produced inside a host session with its
+own identity — a DeepSeek Harness session (`--source-kind dsh
+--source-session-id "$DSH_SESSION_ID"`), a CI run, or another agent runtime —
+pass both flags so the document binds to that session. Source-scoped surfaces
+(the DSH plugin's per-session Reviso tab reads
+`GET /api/documents?session_key=dsh:<sessionId>`) list exactly these documents;
+without them the draft appears only in the owner's full dashboard.
+
 **Publishing prints only the document URL.** There is no `--json` on this command
 and no document id in the output. To act on the document afterwards you need its
 id, so pick it up from the document list:
