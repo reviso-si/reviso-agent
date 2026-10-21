@@ -36,7 +36,7 @@ A local server definition looks like this:
   "mcpServers": {
     "reviso": {
       "command": "python3",
-      "args": ["-m", "reviso", "mcp"],
+      "args": ["-m", "reviso.cli", "mcp"],
       "env": {
         "REVISO_SERVER": "<origin>",
         "REVISO_AUTOMATION_KEY": "<from the environment>"

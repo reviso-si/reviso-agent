@@ -15,6 +15,53 @@
     "install",
     "uninstall"
   ],
+  "allOf": [
+    {
+      "not": {
+        "required": ["operations", "unsupported"],
+        "properties": {
+          "operations": { "contains": { "const": "publish" } },
+          "unsupported": { "contains": { "const": "publish" } }
+        }
+      }
+    },
+    {
+      "not": {
+        "required": ["operations", "unsupported"],
+        "properties": {
+          "operations": { "contains": { "const": "list" } },
+          "unsupported": { "contains": { "const": "list" } }
+        }
+      }
+    },
+    {
+      "not": {
+        "required": ["operations", "unsupported"],
+        "properties": {
+          "operations": { "contains": { "const": "open" } },
+          "unsupported": { "contains": { "const": "open" } }
+        }
+      }
+    },
+    {
+      "not": {
+        "required": ["operations", "unsupported"],
+        "properties": {
+          "operations": { "contains": { "const": "connect" } },
+          "unsupported": { "contains": { "const": "connect" } }
+        }
+      }
+    },
+    {
+      "not": {
+        "required": ["operations", "unsupported"],
+        "properties": {
+          "operations": { "contains": { "const": "status" } },
+          "unsupported": { "contains": { "const": "status" } }
+        }
+      }
+    }
+  ],
   "properties": {
     "contract_version": {
       "const": "1"

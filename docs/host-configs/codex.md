@@ -29,3 +29,11 @@ restart the session.
 
 Missing credential: run the Codex MCP login flow. Do not copy a Reviso key into
 an argument, prompt or repository.
+
+## Verification status
+
+The P0 review verified `codex --help` and config-only MCP registration in an
+isolated HOME. It did not verify a real login or a tool call. Treat the OAuth
+commands above as requiring a final client-version check before documentation
+is presented as production-ready.
+

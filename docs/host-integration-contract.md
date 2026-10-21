@@ -135,6 +135,11 @@ Each adapter publishes a manifest with at least:
 Host-specific fields belong in the adapter section, not in the common contract.
 The manifest is descriptive; the Reviso API remains authoritative.
 
+The JSON Schema validates the manifest shape and the cross-field invariant
+that `operations` and `unsupported` must be disjoint. The companion validator
+implements the same rules for consumers that cannot run a JSON Schema engine;
+both are covered by tests.
+
 ## Capability matrix
 
 | Host | Primary transport | Authentication | Session identity | UI surface | Priority |

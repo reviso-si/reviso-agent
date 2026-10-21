@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 const AUTH_MODES = new Set(['native-host-bridge', 'local-oauth-store', 'bearer-config'])
 const SESSION_MODES = new Set(['native-session', 'workspace-context', 'none'])
 const OPERATIONS = new Set(['publish', 'list', 'open', 'connect', 'status'])
+const FIELDS = new Set(['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'install', 'uninstall', 'update'])
 
 function isStringArray(value, allowed) {
   return Array.isArray(value) && value.every(item => typeof item === 'string' && (allowed === undefined || allowed.has(item)))
@@ -18,6 +19,7 @@ export function validateManifest(value) {
   }
   const required = ['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'install', 'uninstall']
   for (const key of required) if (!(key in value)) errors.push(`missing required field: ${key}`)
+  for (const key of Object.keys(value)) if (!FIELDS.has(key)) errors.push(`unexpected field: ${key}`)
   if (value.contract_version !== '1') errors.push('contract_version must be "1"')
   if (typeof value.adapter !== 'string' || !/^[a-z0-9][a-z0-9._-]*$/.test(value.adapter)) {
     errors.push('adapter must match ^[a-z0-9][a-z0-9._-]*$')
@@ -43,6 +45,10 @@ export function validateManifest(value) {
   if (Array.isArray(value.surfaces) && new Set(value.surfaces).size !== value.surfaces.length) errors.push('surfaces must not contain duplicates')
   if (Array.isArray(value.operations) && new Set(value.operations).size !== value.operations.length) errors.push('operations must not contain duplicates')
   if (Array.isArray(value.unsupported) && new Set(value.unsupported).size !== value.unsupported.length) errors.push('unsupported must not contain duplicates')
+  if (Array.isArray(value.operations) && Array.isArray(value.unsupported)) {
+    const overlap = value.operations.filter((operation) => value.unsupported.includes(operation))
+    if (overlap.length > 0) errors.push(`operations and unsupported must not overlap: ${overlap.join(', ')}`)
+  }
   return errors
 }
 

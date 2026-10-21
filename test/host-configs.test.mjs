@@ -22,3 +22,12 @@ test('host config kits document required capability and credential fields', asyn
     assert.ok(!text.includes('token='), `${name}.md appears to contain a token URL`)
   }
 })
+
+test('documents one verified CLI stdio entry point across MCP setup docs', async () => {
+  const setup = await readFile(new URL('../references/mcp-setup.md', import.meta.url), 'utf8')
+  const fixtureText = await readFile(fixture, 'utf8')
+  assert.ok(setup.includes('"args": ["-m", "reviso.cli", "mcp"]'))
+  assert.ok(!setup.includes('"args": ["-m", "reviso", "mcp"]'))
+  assert.ok(fixtureText.includes('"reviso.cli", "mcp"'))
+})
+

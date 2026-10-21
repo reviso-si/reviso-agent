@@ -32,3 +32,12 @@ configuration.
 
 Verification: `claude --help` plus manifest parsing in an isolated HOME. The
 global marketplace install remains a user-manual step.
+
+## Status
+
+This is a P0 configuration kit, not a marketplace release. The repository's
+`main` branch does not yet contain this P0 branch until it is pushed and
+reviewed. Run `/plugin marketplace add reviso-si/reviso-agent` only after the
+reviewed contract is on `main`; otherwise use a local checkout or
+`--plugin-dir` for testing.
+

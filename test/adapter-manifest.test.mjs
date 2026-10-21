@@ -34,3 +34,21 @@ test('rejects duplicate and missing operation declarations', () => {
   assert.ok(errors.some(e => e.includes('operations must not contain duplicates')))
   assert.ok(errors.some(e => e.includes('unsupported must not contain duplicates')))
 })
+
+test('rejects additional fields and operation overlap to match the schema', () => {
+  const errors = validateManifest({
+    contract_version: '1',
+    adapter: 'sample',
+    authentication: ['bearer-config'],
+    session_identity: 'none',
+    surfaces: ['cli'],
+    operations: ['publish', 'list'],
+    unsupported: ['publish'],
+    install: 'install',
+    uninstall: 'uninstall',
+    surprise: true,
+  })
+  assert.ok(errors.some(e => e.includes('unexpected field: surprise')))
+  assert.ok(errors.some(e => e.includes('operations and unsupported must not overlap')))
+})
+

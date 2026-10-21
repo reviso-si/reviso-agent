@@ -18,6 +18,10 @@ Claude Code:
 /plugin install reviso
 ```
 
+The marketplace entry tracks the repository's published `main` branch. A local
+P0 review branch is not installable through that command until it is merged and
+pushed to `main`.
+
 Other SKILL.md-native hosts: place this repository where the host looks for
 skills. `SKILL.md` is at the repository root and its `references/` directory is
 loaded on demand.
