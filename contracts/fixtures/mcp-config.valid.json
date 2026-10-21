@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "reviso": {
+      "command": "python3",
+      "args": ["-m", "reviso.cli", "mcp"],
+      "env": {
+        "REVISO_SERVER": "https://reviso.work",
+        "REVISO_AUTOMATION_KEY": "${REVISO_AUTOMATION_KEY}",
+        "REVISO_WORKSPACE_ID": "${REVISO_WORKSPACE_ID}"
+      }
+    }
+  }
+}
