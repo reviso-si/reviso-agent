@@ -8,7 +8,9 @@ Cursor MCP configuration.
 Session identity: `workspace-context` at most. Cursor does not provide a
 portable Reviso user-conversation id for this adapter.
 
-Hosted endpoint:
+## Install
+
+Open Cursor's MCP settings and add:
 
 ```text
 https://reviso.work/mcp
@@ -17,7 +19,9 @@ https://reviso.work/mcp
 For a local stdio fallback, use the existing Reviso CLI/MCP package. Do not
 start a new MCP server implementation.
 
-Remove: delete the Reviso MCP entry from Cursor settings and restart the host.
+## Remove
+
+Delete the Reviso MCP entry from Cursor settings and restart Cursor.
 
 Missing credential: show the Reviso connection instructions and stop. Do not
 invent a session tab or publish automatically.
