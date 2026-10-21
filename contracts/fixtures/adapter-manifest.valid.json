@@ -1,0 +1,12 @@
+{
+  "contract_version": "1",
+  "adapter": "dsh",
+  "authentication": ["native-host-bridge"],
+  "session_identity": "native-session",
+  "surfaces": ["slot", "tool"],
+  "operations": ["publish", "list", "open", "connect", "status"],
+  "unsupported": [],
+  "install": "dsh plugin --profile web add dsh-reviso",
+  "uninstall": "dsh plugin --profile web remove dsh-reviso",
+  "update": "dsh plugin --profile web install"
+}

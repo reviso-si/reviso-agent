@@ -1,0 +1,12 @@
+{
+  "contract_version": "1",
+  "adapter": "example-host",
+  "authentication": ["bearer-config"],
+  "session_identity": "none",
+  "surfaces": ["cli"],
+  "operations": ["publish", "list", "open", "connect", "status"],
+  "unsupported": [],
+  "install": "replace with the exact install command",
+  "uninstall": "replace with the exact uninstall command",
+  "update": "replace with the exact update command"
+}

@@ -37,6 +37,8 @@ It will not silently fall back to the command line, and it will not claim a
 document was published unless a call actually returned a URL.
 
 See [references/mcp-setup.md](references/mcp-setup.md) for the connection details.
+The cross-host architecture and adapter capability matrix live in
+[docs/host-integration-contract.md](docs/host-integration-contract.md).
 
 ## Layout
 
@@ -45,6 +47,10 @@ SKILL.md                          the skill the agent loads
 references/mcp-tools.md           the MCP call sequence per turn
 references/cli-usage.md           the command line equivalent
 references/mcp-setup.md           what to tell a user who is not connected
+docs/host-integration-contract.md host integration contract and adapter matrix
+contracts/                        machine-validatable adapter manifest contract
+templates/adapter/                reusable adapter submission template
+docs/host-configs/                per-host MCP setup kits
 ```
 
 ## License

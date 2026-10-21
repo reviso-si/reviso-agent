@@ -1,0 +1,11 @@
+{
+  "contract_version": "1",
+  "adapter": "bad host",
+  "authentication": ["host-token"],
+  "session_identity": "mcp-session",
+  "surfaces": [],
+  "operations": ["publish"],
+  "unsupported": ["teleport"],
+  "install": "",
+  "uninstall": ""
+}

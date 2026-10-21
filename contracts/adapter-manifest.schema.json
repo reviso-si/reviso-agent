@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reviso.work/contracts/adapter-manifest.schema.json",
+  "title": "Reviso host adapter manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "adapter",
+    "authentication",
+    "session_identity",
+    "surfaces",
+    "operations",
+    "unsupported",
+    "install",
+    "uninstall"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1"
+    },
+    "adapter": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "authentication": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "native-host-bridge",
+          "local-oauth-store",
+          "bearer-config"
+        ]
+      }
+    },
+    "session_identity": {
+      "enum": [
+        "native-session",
+        "workspace-context",
+        "none"
+      ]
+    },
+    "surfaces": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "publish",
+          "list",
+          "open",
+          "connect",
+          "status"
+        ]
+      }
+    },
+    "unsupported": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "publish",
+          "list",
+          "open",
+          "connect",
+          "status"
+        ]
+      }
+    },
+    "install": {
+      "type": "string",
+      "minLength": 1
+    },
+    "uninstall": {
+      "type": "string",
+      "minLength": 1
+    },
+    "update": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
