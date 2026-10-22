@@ -13,9 +13,10 @@ it without the user's agreement.
 
 ## One rule that overrides convenience
 
-**Always pass `--base-version-id` when you revise something.** Omitting it is not
-a safe default: the command then re-bases onto whatever version is newest and
-lets your write win. That silently discards a human's concurrent edit.
+**Always pass `--base-version-id` when you revise something.** `update` and
+`rollback` reject an omitted base by default. `--force-latest` is the explicit
+last-writer-wins opt-in; it re-reads the newest version once and is not a
+conflict workaround.
 
 The safe shape is always two steps:
 
@@ -25,7 +26,7 @@ reviso update <document_id> draft.md --description "..." --base-version-id <ver_
 ```
 
 If the write is rejected as a conflict, re-read and re-apply. Do not retry with
-the flag removed.
+the flag removed or reach for `--force-latest`.
 
 ## Connecting
 
