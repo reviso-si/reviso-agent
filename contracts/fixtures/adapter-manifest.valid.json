@@ -6,6 +6,21 @@
   "surfaces": ["slot", "tool"],
   "operations": ["publish", "list", "open", "connect", "status"],
   "unsupported": [],
+  "cross_host": {
+    "write_idempotency": "operation_id_reused_on_retry",
+    "provenance_pair": ["source_kind", "source_session_id"],
+    "review_url": "canonical_absolute",
+    "error_classes": [
+      "not_connected",
+      "auth_expired",
+      "forbidden",
+      "not_found",
+      "conflict",
+      "unavailable",
+      "unsupported"
+    ],
+    "embed_revoke": "required_when_embedded"
+  },
   "install": "dsh plugin --profile web add dsh-reviso",
   "uninstall": "dsh plugin --profile web remove dsh-reviso",
   "update": "dsh plugin --profile web install"

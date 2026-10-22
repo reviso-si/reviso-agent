@@ -12,6 +12,7 @@
     "surfaces",
     "operations",
     "unsupported",
+    "cross_host",
     "install",
     "uninstall"
   ],
@@ -123,6 +124,45 @@
           "connect",
           "status"
         ]
+      }
+    },
+    "cross_host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "write_idempotency",
+        "provenance_pair",
+        "review_url",
+        "error_classes",
+        "embed_revoke"
+      ],
+      "properties": {
+        "write_idempotency": {
+          "const": "operation_id_reused_on_retry"
+        },
+        "provenance_pair": {
+          "const": [
+            "source_kind",
+            "source_session_id"
+          ]
+        },
+        "review_url": {
+          "const": "canonical_absolute"
+        },
+        "error_classes": {
+          "const": [
+            "not_connected",
+            "auth_expired",
+            "forbidden",
+            "not_found",
+            "conflict",
+            "unavailable",
+            "unsupported"
+          ]
+        },
+        "embed_revoke": {
+          "const": "required_when_embedded"
+        }
       }
     },
     "install": {

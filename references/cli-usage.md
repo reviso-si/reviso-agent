@@ -41,6 +41,14 @@ was pasted into chat, tell the user to rotate it.
 `reviso doctor --json` reports whether the server, the credential, and the
 workspace are reachable. Run it first when something looks wrong.
 
+When a command fails, use the normalized class rather than guessing from the
+message: `not_connected` means connect, `auth_expired` means reconnect,
+`forbidden` means stop and request access, `not_found` means re-check the id or
+workspace, `conflict` means re-read before writing, `unavailable` means a
+transport/server failure, and `unsupported` means the command or host lacks that
+capability. Preserve `retryable`, `request_id`, and sanitized `details` in any
+error report.
+
 ## Publishing
 
 ```
@@ -52,20 +60,23 @@ reviso publish draft.md \
 
 Format is inferred from the file extension; `--format html` overrides it.
 
-**Provenance flags.** When the draft is produced inside a host session with its
-own identity — a DeepSeek Harness session (`--source-kind dsh
---source-session-id "$DSH_SESSION_ID"`), a CI run, or another agent runtime —
-pass both flags so the document binds to that session. Source-scoped surfaces
-(the DSH plugin's per-session Reviso tab reads
-`GET /api/documents?session_key=dsh:<sessionId>`) list exactly these documents;
-without them the draft appears only in the owner's full dashboard.
+**Provenance flags.** `source_kind` and `source_session_id` are an all-or-none
+pair. When the draft is produced inside a host session with its own identity — a
+DeepSeek Harness session (`--source-kind dsh --source-session-id
+"$DSH_SESSION_ID"`), a CI run, or another agent runtime — pass both flags so the
+document binds to that session.
+Source-scoped host surfaces list documents for that exact `session_key`; without
+the pair the draft is not session-scoped. If only one value is available, omit
+both and say so.
 
-**Publishing prints only the document URL.** There is no `--json` on this command
-and no document id in the output. To act on the document afterwards you need its
-id, so pick it up from the document list:
+**Machine-readable publish.** Use `--json` when you need the returned
+`document_id`, `version_id`, `workspace_id`, and canonical absolute
+`review_url`. The default legacy output remains URL-only. Do not derive a review
+URL from the document id; use the returned value as supplied.
 
 ```
-reviso documents --json            # match by title, take the id
+reviso publish draft.md --title "Q3 launch plan" --description "Initial draft" \
+  --source-kind dsh --source-session-id "$DSH_SESSION_ID" --json
 ```
 
 ## Reading feedback
@@ -117,12 +128,11 @@ reviso import review-export.json
 These are real limitations of the command line today. Work around them, and tell
 the user rather than papering over them.
 
-- `publish` cannot return the document id, and unlike the other read commands it
-  has no `--json` flag. It prints the URL on one line, so use
-  `reviso documents --json` to pick the id back up.
-- `update` and `rollback` default to last-writer-wins when the base version is
-  omitted. This contradicts the safety guarantee the MCP tools give you. Always
-  pass the flag.
+- The default `publish` output remains URL-only for compatibility. Pass
+  `--json` when the next step needs `document_id` or the other returned ids.
+- `update` and `rollback` require `--base-version-id` by default. The explicit
+  `--force-latest` opt-in re-reads the head and is only for a deliberate
+  last-writer-wins request; it is not a conflict workaround.
 
 Prefer MCP when it is available. The MCP tools return structured ids, enforce the
 base version, and reject a stale write by construction.

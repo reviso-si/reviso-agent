@@ -52,18 +52,27 @@ An embedded surface may render a Reviso document, but it must not acquire
 product credentials directly. The host remains responsible for authentication
 and for passing only the minimum necessary context to the embedded surface.
 
+Embed access is session-scoped. On sign-out, connection removal, host session
+change, or adapter teardown, the host must revoke the embedded Reviso session and
+discard iframe/webview references before clearing or replacing the active tab.
+Revocation is best effort across the network but mandatory at the adapter
+boundary; a failed revoke is reported as `unavailable` and must not be treated as
+a connected session.
+
 ## Common operations
 
 Every adapter exposes the same logical operations, subject to the host
 capability matrix:
 
-- `publish(document, provenance)`: create or update through Reviso's existing
-  publish path. The adapter supplies `source_kind` and, when available, a bare
-  `source_session_id`; Reviso forms `session_key` as `kind:id`.
+- `publish(document, provenance, operation_id)`: create or update through
+  Reviso's existing publish path. The adapter supplies a stable `operation_id`
+  for the logical write and reuses it unchanged when retrying after a timeout or
+  credential refresh. Reviso forms `session_key` as `source_kind:source_session_id`.
 - `list(session?)`: read documents visible to the current connection. Session
   filtering is used only when the host has a stable session identity.
-- `open(document)`: return a canonical Reviso URL or open the host's native
-  document surface.
+- `open(document)`: return a canonical, absolute Reviso `review_url` or open
+  the host's native document surface. Do not derive or rewrite the URL from a
+  document id.
 - `connect()`: start the host-appropriate authorization flow.
 - `status()`: report connected, missing credential, expired credential, or
   host capability limitations.
@@ -98,6 +107,11 @@ Only `native-session` adapters may bind documents to a host session tab. The
 other modes use workspace provenance or no automatic session association.
 Never substitute the MCP transport session id for a user conversation id.
 
+Provenance is an all-or-none pair. If a host session is used, pass both
+`source_kind` and a bare `source_session_id`; if either value is unavailable,
+omit both rather than sending a partial pair. Adapters must not fabricate a
+session id or send the host display name as `source_kind`.
+
 ## Error shape
 
 Adapters normalize host and transport failures into these classes:
@@ -108,12 +122,16 @@ auth_expired        refresh failed; ask the user to reconnect
 forbidden           Reviso permission denied; do not retry blindly
 not_found           document or workspace is unavailable
 conflict            version/hash precondition failed; re-read before writing
-unavailable         transport or server failure; retry only read-only work
+unavailable         transport or server failure; read-only retry only
 unsupported         host lacks the requested capability
 ```
 
-The original Reviso error code and request id may be attached as diagnostics,
-but adapters must not expose tokens or raw credentials.
+The original Reviso error code, retryability, request id, and sanitized details may
+be attached as diagnostics, but the stable top-level class must be one of the
+seven values above. Adapters must not expose tokens or raw credentials. A
+`conflict` is never retried with unchanged preconditions. An `unavailable` read
+may be retried; a publish or patch write may be retried only when the operation
+accepts an idempotency value and the same value is reused.
 
 ## Adapter manifest
 
@@ -127,6 +145,22 @@ Each adapter publishes a manifest with at least:
   "session_identity": "native-session",
   "surfaces": ["slot", "tool"],
   "operations": ["publish", "list", "open", "connect", "status"],
+  "unsupported": [],
+  "cross_host": {
+    "write_idempotency": "operation_id_reused_on_retry",
+    "provenance_pair": ["source_kind", "source_session_id"],
+    "review_url": "canonical_absolute",
+    "error_classes": [
+      "not_connected",
+      "auth_expired",
+      "forbidden",
+      "not_found",
+      "conflict",
+      "unavailable",
+      "unsupported"
+    ],
+    "embed_revoke": "required_when_embedded"
+  },
   "install": "dsh plugin --profile web add <package>",
   "uninstall": "dsh plugin --profile web remove dsh-reviso"
 }
@@ -135,10 +169,10 @@ Each adapter publishes a manifest with at least:
 Host-specific fields belong in the adapter section, not in the common contract.
 The manifest is descriptive; the Reviso API remains authoritative.
 
-The JSON Schema validates the manifest shape and the cross-field invariant
-that `operations` and `unsupported` must be disjoint. The companion validator
-implements the same rules for consumers that cannot run a JSON Schema engine;
-both are covered by tests.
+The JSON Schema validates the manifest shape, the disjoint
+`operations`/`unsupported` invariant, and the fixed `cross_host` behavior
+block. The companion validator implements the same rules for consumers that
+cannot run a JSON Schema engine; both are covered by tests.
 
 ## Capability matrix
 
@@ -161,6 +195,8 @@ Every adapter submission contains:
 - install, uninstall, and update commands
 - authentication implementation for exactly one declared mode
 - `publish/list/open/session` behavior, with unsupported capabilities explicit
+- idempotent publish, all-or-none provenance, canonical review URLs, normalized
+  errors, and embed-session revocation when an embedded surface is declared
 - contract tests against the common operations
 - one real-host smoke test
 - README with setup, rollback, and limitations

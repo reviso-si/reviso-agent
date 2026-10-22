@@ -7,6 +7,12 @@ publish a revision based on the version you actually read.
 Tool results can carry `isError: true` on a result that otherwise looks fine.
 Always check that field. A JSON-RPC `result` wrapper is not proof of success.
 
+Host integrations normalize failures to one of `not_connected`, `auth_expired`,
+`forbidden`, `not_found`, `conflict`, `unavailable`, or `unsupported`. A
+`conflict` means re-read before writing; retry `unavailable` reads as needed,
+and retry a write only with the same idempotency value. Preserve any
+`retryable`, `request_id`, and sanitized `details` diagnostics for the user.
+
 ## Not every connection exposes every tool
 
 A connection can be restricted to a smaller catalog. The core catalog is these
@@ -49,25 +55,28 @@ reviso_document_create
   description    "Initial draft"            (required)
   source_format  "markdown" | "html"        (default markdown)
   workspace_id   optional
-  source_kind         optional
-  source_session_id   optional
+  operation_id        stable id for this logical write
+  source_kind         optional, pass with source_session_id
+  source_session_id   optional, pass with source_kind
 ```
 
 `description` is required even on create; say what this version is.
 
-**Provenance (`source_kind` / `source_session_id`).** When the draft is produced
-inside a host session that has its own identity — a DeepSeek Harness session
-(`source_kind: "dsh"`, `source_session_id: <the harness session id>`), a CI run,
-or another agent runtime — pass both fields so the document is bound to that
-session. Source-scoped surfaces (for example the DSH plugin's per-session
-Reviso tab, which reads `GET /api/documents?session_key=dsh:<sessionId>`) list
-exactly these documents; a draft published without them shows up only in the
-owner's full dashboard. Use the real session id you are running in, never a
-guessed one.
+**Provenance (`source_kind` / `source_session_id`).** These are an all-or-none
+pair. When the draft is produced inside a host session that has its own identity
+— a DeepSeek Harness session (`source_kind: "dsh"`,
+`source_session_id: <the harness session id>`), a CI run, or another agent
+runtime — pass both fields so the document is bound to that session.
+Source-scoped host surfaces list documents for that exact `session_key`; a
+draft published without the pair is not session-scoped. Use the real session id
+you are running in, never a guessed one. If only one value is available, omit
+both and say the draft is not session-scoped.
 
-The result carries the document link. Give the human the plain document URL, not
-a share link, unless they asked for a share link. Keep the `document_id` for later
-turns; every result returns it.
+**Canonical URL.** Return the canonical absolute `review_url` supplied by
+Reviso, byte for byte; do not construct, normalize, or rewrite it from
+`document_id`. Give the human the plain review URL, not a share link, unless
+they asked for a share link. Keep the `document_id` for later turns; every
+result returns it.
 
 If the account has several workspaces the call fails and names them. Call
 `reviso_list_workspaces` and ask the user which one, rather than guessing.
@@ -108,6 +117,7 @@ reviso_document_apply_patch
   ops              [{ "type": "replace_block", ... }]
   base_version_id  "<ver_... from read_structure>"
   description      "Address reviewer feedback"
+  idempotency_key  stable id for this logical patch
 ```
 
 `read_structure` returns the document's `base_version_id`, `update_seq`, and a
@@ -130,6 +140,7 @@ reviso_document_update
   base_version_id  "<version_id you just read>"
   description      "Rewrite the launch plan"
   source_format    "markdown" | "html"
+  operation_id     stable id for this logical write
 ```
 
 There is no cross-version merge here. A stale `base_version_id` is rejected as a
@@ -177,9 +188,16 @@ when explaining to a human what changed between their edit and yours.
 ## Retries
 
 `reviso_document_create` and `reviso_document_update` accept an `operation_id`,
-and `reviso_document_apply_patch` accepts an `idempotency_key`. If a call times
-out, reuse the *same* value on the retry so a committed-but-lost response replays
-instead of writing a second version. A fresh key is for a genuinely new edit.
+and `reviso_document_apply_patch` accepts an `idempotency_key`. Generate one
+stable value for each logical write, before the first attempt, and reuse it
+unchanged after a timeout, transport failure, or credential refresh. That lets a
+committed-but-lost response replay instead of writing a second version. A fresh
+key is only for a genuinely new edit; a retry with a fresh key can duplicate the
+write.
+
+For create retries, the provenance pair is part of the operation identity.
+Reusing an `operation_id` with a different `source_kind`/`source_session_id`
+pair is a conflict, not a replay.
 
 ## Related tools
 

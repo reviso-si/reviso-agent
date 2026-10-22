@@ -35,7 +35,19 @@ Authentication must use exactly one declared mode. A missing credential returns
 Never place a Reviso token in committed files, logs, screenshots or chat.
 
 If the host lacks a stable user session, declare `session_identity: "none"`.
-Do not use the MCP transport session as a user conversation identity.
+Do not use the MCP transport session as a user conversation identity. Session
+provenance is all-or-none: send `source_kind` and `source_session_id` together,
+or send neither.
+
+Every logical write gets a stable `operation_id` before its first attempt and
+reuses it on retry, including after a credential refresh. Return the canonical
+absolute `review_url` supplied by Reviso rather than constructing one. Normalize
+errors to `not_connected`, `auth_expired`, `forbidden`, `not_found`,
+`conflict`, `unavailable`, or `unsupported`.
+
+When an embedded surface is used, revoke its Reviso session on sign-out,
+disconnect, host session change, and adapter teardown. A failed revoke is
+reported as `unavailable` and does not leave the surface marked connected.
 
 ## Validation
 

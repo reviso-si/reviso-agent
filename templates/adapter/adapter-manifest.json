@@ -6,6 +6,21 @@
   "surfaces": ["cli"],
   "operations": ["publish", "list", "open", "connect", "status"],
   "unsupported": [],
+  "cross_host": {
+    "write_idempotency": "operation_id_reused_on_retry",
+    "provenance_pair": ["source_kind", "source_session_id"],
+    "review_url": "canonical_absolute",
+    "error_classes": [
+      "not_connected",
+      "auth_expired",
+      "forbidden",
+      "not_found",
+      "conflict",
+      "unavailable",
+      "unsupported"
+    ],
+    "embed_revoke": "required_when_embedded"
+  },
   "install": "replace with the exact install command",
   "uninstall": "replace with the exact uninstall command",
   "update": "replace with the exact update command"

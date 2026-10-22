@@ -6,6 +6,13 @@
   "surfaces": [],
   "operations": ["publish"],
   "unsupported": ["teleport"],
+  "cross_host": {
+    "write_idempotency": "fresh_key_each_retry",
+    "provenance_pair": ["source_kind"],
+    "review_url": "relative_path",
+    "error_classes": ["not_connected", "auth_expired"],
+    "embed_revoke": "optional"
+  },
   "install": "",
   "uninstall": ""
 }

@@ -6,10 +6,46 @@ import { fileURLToPath } from 'node:url'
 const AUTH_MODES = new Set(['native-host-bridge', 'local-oauth-store', 'bearer-config'])
 const SESSION_MODES = new Set(['native-session', 'workspace-context', 'none'])
 const OPERATIONS = new Set(['publish', 'list', 'open', 'connect', 'status'])
-const FIELDS = new Set(['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'install', 'uninstall', 'update'])
+const CROSS_HOST_FIELDS = new Set(['write_idempotency', 'provenance_pair', 'review_url', 'error_classes', 'embed_revoke'])
+const CROSS_HOST = {
+  write_idempotency: 'operation_id_reused_on_retry',
+  provenance_pair: ['source_kind', 'source_session_id'],
+  review_url: 'canonical_absolute',
+  error_classes: ['not_connected', 'auth_expired', 'forbidden', 'not_found', 'conflict', 'unavailable', 'unsupported'],
+  embed_revoke: 'required_when_embedded',
+}
+const FIELDS = new Set(['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'cross_host', 'install', 'uninstall', 'update'])
 
 function isStringArray(value, allowed) {
   return Array.isArray(value) && value.every(item => typeof item === 'string' && (allowed === undefined || allowed.has(item)))
+}
+
+function validateCrossHost(value, errors) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    errors.push('cross_host must be an object')
+    return
+  }
+  for (const key of Object.keys(value)) {
+    if (!CROSS_HOST_FIELDS.has(key)) errors.push(`unexpected field: cross_host.${key}`)
+  }
+  for (const key of CROSS_HOST_FIELDS) {
+    if (!(key in value)) errors.push(`missing required field: cross_host.${key}`)
+  }
+  if (value.write_idempotency !== CROSS_HOST.write_idempotency) {
+    errors.push(`cross_host.write_idempotency must be "${CROSS_HOST.write_idempotency}"`)
+  }
+  if (JSON.stringify(value.provenance_pair) !== JSON.stringify(CROSS_HOST.provenance_pair)) {
+    errors.push('cross_host.provenance_pair must require source_kind and source_session_id together')
+  }
+  if (value.review_url !== CROSS_HOST.review_url) {
+    errors.push(`cross_host.review_url must be "${CROSS_HOST.review_url}"`)
+  }
+  if (JSON.stringify(value.error_classes) !== JSON.stringify(CROSS_HOST.error_classes)) {
+    errors.push('cross_host.error_classes must list all supported error classes in canonical order')
+  }
+  if (value.embed_revoke !== CROSS_HOST.embed_revoke) {
+    errors.push(`cross_host.embed_revoke must be "${CROSS_HOST.embed_revoke}"`)
+  }
 }
 
 export function validateManifest(value) {
@@ -17,7 +53,7 @@ export function validateManifest(value) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     return ['manifest must be a JSON object']
   }
-  const required = ['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'install', 'uninstall']
+  const required = ['contract_version', 'adapter', 'authentication', 'session_identity', 'surfaces', 'operations', 'unsupported', 'cross_host', 'install', 'uninstall']
   for (const key of required) if (!(key in value)) errors.push(`missing required field: ${key}`)
   for (const key of Object.keys(value)) if (!FIELDS.has(key)) errors.push(`unexpected field: ${key}`)
   if (value.contract_version !== '1') errors.push('contract_version must be "1"')
@@ -35,6 +71,7 @@ export function validateManifest(value) {
     errors.push('operations must be a non-empty array of supported operations')
   }
   if (!isStringArray(value.unsupported, OPERATIONS)) errors.push('unsupported must be an array of supported operations')
+  validateCrossHost(value.cross_host, errors)
   for (const key of ['install', 'uninstall']) {
     if (typeof value[key] !== 'string' || value[key].length === 0) errors.push(`${key} must be a non-empty string`)
   }

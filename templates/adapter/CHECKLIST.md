@@ -8,6 +8,11 @@
 - [ ] Install, uninstall and update commands were executed or marked as user-manual.
 - [ ] Missing credential produces `not_connected`, not a crash or blank UI.
 - [ ] Expired credential produces `auth_expired`, not a blind retry loop.
+- [ ] Every logical write reuses one `operation_id` across retries and refresh.
+- [ ] `source_kind` and `source_session_id` are sent together or omitted together.
+- [ ] `open` returns the supplied canonical absolute `review_url`.
+- [ ] All seven shared error classes are implemented and diagnostics are sanitized.
+- [ ] Embedded sessions revoke on sign-out, disconnect, session change and teardown.
 - [ ] No token appears in git, logs, screenshots, fixtures or test output.
 - [ ] Unit/contract tests pass.
 - [ ] One real-host smoke test exists and is explicitly opt-in.
