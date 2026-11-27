@@ -16,11 +16,14 @@ The shortest path, and the only one that works in hosts without a local shell.
 Once connected, the Reviso tools appear in the session and the main skill takes
 over again.
 
-## Fallback: a local server
+## Local stdio for self-hosted installations
 
-Only for hosts that require a locally launched server. This path needs a package
-install, a workspace-scoped credential, and a session restart, so prefer the
-hosted connector when the host supports it.
+Use local stdio when the host can launch the Python environment that contains
+the Reviso backend. In that environment, run `python3 -m reviso.cli mcp --help`
+to verify the entry point. Set the host's `command` to that Python executable.
+
+The public `reviso-cli` package provides the HTTP command-line client. Users
+with only that package can connect their agent through the hosted setup above.
 
 The user needs three values, which they supply through the client's own private
 environment, never through chat:

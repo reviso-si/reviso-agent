@@ -1,8 +1,7 @@
 # Host MCP configs
 
-These kits reuse the existing Reviso hosted `/mcp` endpoint and the existing
-CLI stdio bridge. None of them introduces a parallel MCP server or business
-model.
+These kits connect to the hosted Reviso `/mcp` endpoint. Self-hosted installations
+can also use the [stdio bridge supplied with the backend](../../references/mcp-setup.md).
 
 - [Claude Code](claude-code.md)
 - [Codex](codex.md)

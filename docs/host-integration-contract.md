@@ -29,13 +29,13 @@ MCP
   = generic call protocol; not the only route
 
 CLI
-  = optional local auth/refresh/stdio bridge, not a required host layer
+  = HTTP client with local login and token refresh
 ```
 
 DSH uses a native host bridge and does not require the CLI. MCP-native hosts
-can use `/mcp` with their own credential configuration. Local hosts without a
-native bridge may use the CLI. The CLI is not a prerequisite for DSH, VS Code,
-or any host that already provides a credential and transport bridge.
+can use `/mcp` with their own credential configuration. Self-hosted MCP clients
+can launch the stdio bridge supplied with the backend. Shell-based integrations
+can use the public `reviso-cli` package.
 
 ## Host surfaces
 
@@ -179,7 +179,7 @@ cannot run a JSON Schema engine; both are covered by tests.
 | Host | Primary transport | Authentication | Session identity | UI surface | Priority |
 | --- | --- | --- | --- | --- | --- |
 | DSH | native bundle + host tool | native-host-bridge | native-session | slot + tab | P0.1 |
-| Generic MCP | hosted `/mcp` or CLI stdio | bearer-config or local-oauth-store | none | none | P0.2 |
+| Generic MCP | hosted `/mcp` or self-hosted backend stdio | bearer-config or local-oauth-store | none | none | P0.2 |
 | Claude Code | MCP + skill/plugin | local-oauth-store | capability dependent | skill + marketplace | P0.3 |
 | Gemini CLI | extension + MCP | local-oauth-store | to be verified | extension | P1.0 |
 | VS Code | MCP-only first | host secret or bearer | workspace-context | command | P1.1 |
@@ -206,7 +206,7 @@ Every adapter submission contains:
 ## Delivery order
 
 1. Fix the DSH client type/import and `dsh.client.inject` manifest alignment.
-2. Treat the existing Reviso `/mcp` endpoint and CLI stdio path as the shared
+2. Treat the existing Reviso `/mcp` endpoint and self-hosted backend stdio path as the shared
    MCP base; do not create a parallel MCP business server.
 3. Finalize `reviso-agent` as the Claude Code marketplace/skill surface.
 4. Add a Gemini CLI extension manifest over MCP.

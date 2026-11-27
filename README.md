@@ -15,12 +15,10 @@ Claude Code:
 
 ```
 /plugin marketplace add reviso-si/reviso-agent
-/plugin install reviso
+/plugin install reviso@reviso-agent
 ```
 
-The marketplace entry tracks the repository's published `main` branch. A local
-P0 review branch is not installable through that command until it is merged and
-pushed to `main`.
+The marketplace entry tracks the repository's published `main` branch.
 
 Other SKILL.md-native hosts: place this repository where the host looks for
 skills. `SKILL.md` is at the repository root and its `references/` directory is
@@ -32,9 +30,8 @@ The skill is instructions, not a connection. It needs one of:
 
 - **A hosted Reviso connection** (preferred). Open the agent setup page in
   Reviso and authorize. No key is copied by hand.
-- **A locally launched Reviso server**, for hosts that require one. This needs the
-  command line installed plus a workspace-scoped key, and a restart of the agent
-  session.
+- **A local stdio connection**, for self-hosted installations. The host needs
+  the Python environment containing the Reviso backend and a workspace-scoped key.
 
 The skill detects which of these is available and tells the user what is missing.
 It will not silently fall back to the command line, and it will not claim a

@@ -1,11 +1,11 @@
 # Reviso command line
 
 Use this file only when the user asked for the command line, or when their
-environment has no MCP support. Check that `reviso` exists before running
-anything. If it does not, ask before installing:
+environment has no MCP support. The examples use `reviso-cli` 0.3.0 or later.
+With the user's agreement, install or upgrade the client:
 
 ```bash
-pip install reviso-cli
+python -m pip install --upgrade 'reviso-cli>=0.3.0'
 ```
 
 It installs the `reviso` command and has no runtime dependencies. Do not install

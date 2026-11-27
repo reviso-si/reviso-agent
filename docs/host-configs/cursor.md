@@ -16,8 +16,8 @@ Open Cursor's MCP settings and add:
 https://reviso.work/mcp
 ```
 
-For a local stdio fallback, use the existing Reviso CLI/MCP package. Do not
-start a new MCP server implementation.
+For self-hosted stdio, point Cursor at the Python environment containing the
+Reviso backend. Follow the [local setup](../../references/mcp-setup.md).
 
 ## Remove
 
